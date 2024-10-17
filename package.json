@@ -45,7 +45,6 @@
     "typescript": "4.4.4"
   },
   "dependencies": {
-    "@bitgo/utxo-lib": "git+https://github.com/VerusCoin/BitGoJS.git#8a9c08f51f3af53cd691ff5346196d54b34ae04c",
     "@electron/remote": "1.1.0",
     "@ethersproject/signing-key": "5.0.5",
     "@xmldom/xmldom": "0.8.4",
