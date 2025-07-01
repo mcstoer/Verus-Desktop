@@ -8005,12 +8005,13 @@ verror@^1.10.0:
     bs58check "2.0.0"
     create-hash "1.2.0"
 
-"verus-typescript-primitives@git+https://github.com/mcstoer/verus-typescript-primitives.git#credential-class":
+"verus-typescript-primitives@git+https://github.com/mcstoer/verus-typescript-primitives.git#credential-class-iur":
   version "1.0.0"
-  resolved "git+https://github.com/mcstoer/verus-typescript-primitives.git#0d06b404ec018be0df7a47d5551b1cf241df59fc"
+  resolved "git+https://github.com/mcstoer/verus-typescript-primitives.git#02909300fb884b6274d95a01f0b3473a32e9cb4d"
   dependencies:
     base64url "3.0.1"
     bech32 "2.0.0"
+    blake2b "https://github.com/VerusCoin/blake2b"
     bn.js "5.2.1"
     bs58check "2.0.0"
     create-hash "1.2.0"
