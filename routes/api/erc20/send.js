@@ -24,19 +24,19 @@ module.exports = (api) => {
     const fromAddress = api.erc20.wallet.address
     const signer = new ethers.VoidSigner(fromAddress, web3Provider.interface.DefaultProvider)
     const contract = web3Provider.contract.connect(signer)
-    const balance = await contract.balanceOf(signer.getAddress())
-    const maxFeePerGas = (await web3Provider.InfuraProvider.getFeeData()).maxFeePerGas;
+    const balance = BigInt(await contract.balanceOf(signer.getAddress()))
+    const maxFeePerGas = (await web3Provider.interface.InfuraProvider.getFeeData()).maxFeePerGas;
     const amountBn = ethers.parseUnits(
       scientificToDecimal(amount),
       web3Provider.decimals
     );
     let gasEst = null
+    let gasLimit;
     let transaction = null 
 
     try {
-      gasEst = await contract.transfer.estimateGas(address, amountBn)
-
-      const gasLimit = gasEst + (gasEst / BigInt(3));
+      gasEst = BigInt(await contract.transfer.estimateGas(address, amountBn))
+      gasLimit = gasEst + (gasEst / BigInt(3));
 
       transaction = await contract.transfer.staticCall(
         address,
@@ -59,7 +59,7 @@ module.exports = (api) => {
       fee: ethers.formatEther(maxFee),
       total: ethers.formatUnits(amountBn, web3Provider.decimals),
       remainingBalance: ethers.formatUnits(
-        balance.sub(amountBn),
+        balance - amountBn,
         web3Provider.decimals
       ),
       maxFeePerGas: ethers.formatEther(maxFeePerGas),
@@ -84,7 +84,6 @@ module.exports = (api) => {
     const privKey = api.erc20.wallet.signer.signingKey.privateKey
     const dummySigner = new ethers.VoidSigner(api.erc20.wallet.address, web3Provider.interface.DefaultProvider)
     const contract = web3Provider.contract.connect(dummySigner)
-    const maxFeePerGas = (await web3Provider.InfuraProvider.getFeeData()).maxFeePerGas;
     const amountBn = ethers.parseUnits(
       scientificToDecimal(amount),
       web3Provider.decimals
@@ -99,7 +98,7 @@ module.exports = (api) => {
     let response = null
 
     try {
-      gasEst = await contract.transfer.estimateGas(address, amountBn)
+      gasEst = BigInt(await contract.transfer.estimateGas(address, amountBn))
       response = await signableContract.transfer(
         address,
         amountBn
@@ -109,7 +108,7 @@ module.exports = (api) => {
       throw new Error(Web3Interface.decodeWeb3Error(e.message).message)
     }
 
-    const maxFee = gasEst * maxFeePerGas;
+    const maxFee = response.maxFeePerGas * response.gasLimit;
 
     try {
       if (!api.erc20.contracts[contractId].temp.pending_txs[response.hash]) {
