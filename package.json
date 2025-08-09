@@ -63,7 +63,7 @@
     "create-hash": "git+https://github.com/pbca26/createHash#electron-v4",
     "crypto-js": "4.2.0",
     "csv-writer": "1.6.0",
-    "ethers": "5.1.0",
+    "ethers": "6.15.0",
     "ethers-michaeltout": "github:michaeltout/ethersjs-package",
     "express": "4.19.2",
     "fix-path": "2.1.0",

@@ -16,7 +16,7 @@ module.exports = (api) => {
           address: api.erc20.get_address(),
           tag: "eth",
           balances: {
-            native: ethers.utils.formatUnits(
+            native: ethers.formatUnits(
               await api.erc20.get_wallet_balance(contractId),
               api.erc20.contracts[contractId].decimals
             ),
