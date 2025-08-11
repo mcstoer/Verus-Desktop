@@ -24,42 +24,46 @@ module.exports = (api) => {
     const fromAddress = api.erc20.wallet.address
     const signer = new ethers.VoidSigner(fromAddress, web3Provider.interface.DefaultProvider)
     const contract = web3Provider.contract.connect(signer)
-    const balance = await contract.balanceOf(signer.getAddress())
-    const gasPrice = await web3Provider.interface.DefaultProvider.getGasPrice()
-    const amountBn = ethers.utils.parseUnits(
+    const balance = BigInt(await contract.balanceOf(signer.getAddress()))
+    const maxFeePerGas = (await web3Provider.interface.InfuraProvider.getFeeData()).maxFeePerGas;
+    const amountBn = ethers.parseUnits(
       scientificToDecimal(amount),
       web3Provider.decimals
     );
     let gasEst = null
+    let gasLimit;
     let transaction = null 
 
     try {
-      gasEst = await contract.estimateGas.transfer(address, amountBn)
-      transaction = await contract.callStatic.transfer(
+      gasEst = BigInt(await contract.transfer.estimateGas(address, amountBn))
+      gasLimit = gasEst + (gasEst / BigInt(3));
+
+      transaction = await contract.transfer.staticCall(
         address,
-        amountBn
+        amountBn,
+        { gasLimit: gasLimit, maxFeePerGas: maxFeePerGas }
       );
     } catch(e) {   
       api.log(e.message, 'erc20_preflight')   
       throw new Error(Web3Interface.decodeWeb3Error(e.message).message)
     }
     
-    const maxFee = gasEst.mul(gasPrice)
+    const maxFee = gasLimit * maxFeePerGas
     
     return {
       chainTicker: web3Provider.symbol,
       to: address,
       from: fromAddress,
-      balance: ethers.utils.formatUnits(balance, web3Provider.decimals),
-      value: ethers.utils.formatUnits(amountBn, web3Provider.decimals),
-      fee: ethers.utils.formatEther(maxFee),
-      total: ethers.utils.formatUnits(amountBn, web3Provider.decimals),
-      remainingBalance: ethers.utils.formatUnits(
-        balance.sub(amountBn),
+      balance: ethers.formatUnits(balance, web3Provider.decimals),
+      value: ethers.formatUnits(amountBn, web3Provider.decimals),
+      fee: ethers.formatEther(maxFee),
+      total: ethers.formatUnits(amountBn, web3Provider.decimals),
+      remainingBalance: ethers.formatUnits(
+        balance - amountBn,
         web3Provider.decimals
       ),
-      gasPrice: ethers.utils.formatEther(gasPrice),
-      gasLimit: ethers.utils.formatEther(gasEst),
+      maxFeePerGas: ethers.formatEther(maxFeePerGas),
+      gasLimit: ethers.formatEther(gasLimit),
       warnings: [],
       transaction,
       decimals: web3Provider.decimals,
@@ -80,14 +84,13 @@ module.exports = (api) => {
     const privKey = api.erc20.wallet.signer.signingKey.privateKey
     const dummySigner = new ethers.VoidSigner(api.erc20.wallet.address, web3Provider.interface.DefaultProvider)
     const contract = web3Provider.contract.connect(dummySigner)
-    const gasPrice = await web3Provider.interface.DefaultProvider.getGasPrice()
-    const amountBn = ethers.utils.parseUnits(
+    const amountBn = ethers.parseUnits(
       scientificToDecimal(amount),
       web3Provider.decimals
     );
     const signableContract = web3Provider.contract.connect(
       new ethers.Wallet(
-        ethers.utils.hexlify(privKey),
+        ethers.hexlify(privKey),
         web3Provider.interface.InfuraProvider
       )
     );
@@ -95,7 +98,7 @@ module.exports = (api) => {
     let response = null
 
     try {
-      gasEst = await contract.estimateGas.transfer(address, amountBn)
+      gasEst = BigInt(await contract.transfer.estimateGas(address, amountBn))
       response = await signableContract.transfer(
         address,
         amountBn
@@ -105,28 +108,33 @@ module.exports = (api) => {
       throw new Error(Web3Interface.decodeWeb3Error(e.message).message)
     }
 
-    const maxFee = gasEst.mul(gasPrice)
+    const maxFee = response.maxFeePerGas * response.gasLimit;
 
-    if (!api.erc20.contracts[contractId].temp.pending_txs[response.hash]) {
-      api.erc20.contracts[contractId].temp.pending_txs[response.hash] = {
-        hash: response.hash,
-        confirmations: 0,
-        from: response.from,
-        gasPrice: response.gasPrice,
-        gasLimit: response.gasLimit,
-        to: address,
-        value: amountBn,
-        nonce: response.nonce,
-        data: response.data,
-        chainId: response.data
+    try {
+      if (!api.erc20.contracts[contractId].temp.pending_txs[response.hash]) {
+        api.erc20.contracts[contractId].temp.pending_txs[response.hash] = {
+          hash: response.hash,
+          confirmations: 0,
+          from: response.from,
+          gasPrice: response.maxFeePerGas.toString(),
+          gasLimit: response.gasLimit.toString(),
+          to: address,
+          value: amountBn.toString(),
+          nonce: response.nonce,
+          data: response.data,
+          chainId: response.data
+        }
       }
+    } catch(e) {
+      console.log(`Error saving tx ${response.hash} to cache`)
+      console.log(e)
     }
     
     return {
       to: address,
       from: response.from,
-      fee: Number(ethers.utils.formatUnits(maxFee, web3Provider.decimals)),
-      value: ethers.utils.formatUnits(amountBn, web3Provider.decimals),
+      fee: Number(ethers.formatUnits(maxFee, web3Provider.decimals)),
+      value: ethers.formatUnits(amountBn, web3Provider.decimals),
       txid: response.hash
     };
   }
@@ -152,9 +160,12 @@ module.exports = (api) => {
     const { chainTicker, toAddress, amount } = req.body
 
     try {
+      const response = await api.erc20.txPreflight(chainTicker, toAddress, amount.toString());
+      delete response.transaction;
+
       res.send(JSON.stringify({
         msg: 'success',
-        result: await api.erc20.txPreflight(chainTicker, toAddress, amount.toString()),
+        result: response
       }));
     } catch(e) {
       const retObj = {

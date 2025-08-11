@@ -1,6 +1,5 @@
 const { ETH_HOMESTEAD } = require('../utils/constants/eth_networks');
 const createInterface = require('../utils/web3/provider');
-const ethers = require('ethers')
 
 module.exports = (api) => {  
   api.setPost('/erc20/coins/activate', async (req, res, next) => {
@@ -25,8 +24,8 @@ module.exports = (api) => {
             },
             decimals:
               contract.decimals != null
-                ? await contract.decimals()
-                : ethers.BigNumber.from("18"),
+                ? Number(await contract.decimals())
+                : 18,
             symbol:
               contract.symbol != null ? await contract.symbol() : chainTicker,
           };

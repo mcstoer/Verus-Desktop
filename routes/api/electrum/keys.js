@@ -4,11 +4,11 @@ const bitcoin = require('bitgo-utxo-lib');
 const bs58check = require('bs58check');
 const wif = require('wif');
 const {
-  seedToPriv,
   getAddressVersion,
   addressVersionCheck,
 } = require('agama-wallet-lib/src/keys');
 const networks = require('agama-wallet-lib/src/bitcoinjs-networks');
+const deriveScalarFromSeed = require('../utils/auth/scalar');
 
 module.exports = (api) => {
   api.wifToWif = (wif, network) => {
@@ -84,17 +84,23 @@ module.exports = (api) => {
   };
 
   api.seedToWif = (seed, network, iguana) => {
-    let bytes = crypto.createHash('sha256').update(seed).digest()
+    const { dBigi } = deriveScalarFromSeed(seed, {
+      iguana: !!iguana,
+      logWarn: (msg) => {
+        api.alertMainWindow({
+          title: "Private Key Warning!",
+          message: msg,
+          buttons: ["OK"],
+          type: "warning",
+        })
+      }
+    });
 
-    if (iguana) {
-      bytes[0] &= 248;
-      bytes[31] &= 127;
-      bytes[31] |= 64;
-    }
+    const _network = network.hasOwnProperty('pubKeyHash')
+      ? network
+      : api.getNetworkData(network.toLowerCase());
 
-    const d = bigi.fromBuffer(bytes);
-    const _network = network.hasOwnProperty('pubKeyHash') ? network : api.getNetworkData(network.toLowerCase());
-    let keyPair = new bitcoin.ECPair(d, null, { network: _network });
+    let keyPair = new bitcoin.ECPair(dBigi, null, { network: _network });
     let keys = {
       pub: keyPair.getAddress(),
       priv: keyPair.toWIF(),
@@ -118,11 +124,13 @@ module.exports = (api) => {
           pubHex: keyPair.getPublicKeyBuffer().toString('hex'),
           fromWif: api.fromWif(keyPair.toWIF(), _network),
         };
-      } catch (e) {}
+      } catch (e) {
+        // ignore: not a valid WIF for this network; keep hash-derived keys
+      }
     }
 
     return keys;
-  }
+  };
 
   api.pubkeyToAddress = (pubkey, coin) => {
     try {
