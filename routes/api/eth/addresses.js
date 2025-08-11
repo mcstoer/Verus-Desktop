@@ -15,7 +15,7 @@ module.exports = (api) => {
         address: api.eth.get_address(),
         tag: "eth",
         balances: {
-          native: ethers.utils.formatEther(await api.eth.get_wallet_balance()),
+          native: ethers.formatEther(await api.eth.get_wallet_balance()),
           reserve: {}
         }
       }],

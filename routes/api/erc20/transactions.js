@@ -1,4 +1,3 @@
-const ethers = require('ethers');
 const standardizeEthTxObj = require('../utils/standardization/standardizeEthTxObj');
 
 module.exports = (api) => {  
