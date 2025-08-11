@@ -20,8 +20,8 @@ module.exports = (api) => {
 
     const fromAddress = api.eth.wallet.address
     const signer = new ethers.VoidSigner(fromAddress, api.eth.interface.EtherscanProvider)
-    const balance = await signer.getBalance()
-    const value = ethers.utils.parseEther(scientificToDecimal(amount))
+    const balance = await api.eth.interface.DefaultProvider.getBalance(fromAddress)
+    const value = ethers.parseEther(scientificToDecimal(amount))
 
     let transaction = {}
 
@@ -31,7 +31,7 @@ module.exports = (api) => {
         from: fromAddress,
         value,
         chainId: api.eth.interface.network.id,
-        gasLimit: ethers.BigNumber.from(42000)
+        gasLimit: BigInt(42000)
       });
     } catch(e) {  
       api.log(e.message, 'eth_preflight')    
@@ -42,39 +42,38 @@ module.exports = (api) => {
       throw new Error(`"${address}" is not a valid ETH destination.`)
     }
 
-    const maxFee = transaction.gasLimit.mul(transaction.gasPrice)
-    const maxValue = maxFee.add(value)
+    const maxFee = transaction.gasLimit * transaction.maxFeePerGas
+    const maxValue = maxFee + value
 
-    if (maxValue.gt(balance)) {
-      const adjustedValue = value.sub(maxFee)
+    if (maxValue > balance) {
+      const adjustedValue = value - maxFee
 
-      if (adjustedValue.lt(ethers.BigNumber.from(0)))
+      if (adjustedValue < BigInt(0)) {
         throw new Error(
-          `Insufficient funds, cannot cover fee costs of at least ${ethers.utils.formatEther(maxFee)} ETH.`
+          `Insufficient funds, cannot cover fee costs of at least ${ethers.formatEther(maxFee)} ETH.`
         );
-      else
+      } else {
         return await api.eth.txPreflight(
           address,
-          ethers.utils.formatEther(adjustedValue),
+          ethers.formatEther(adjustedValue),
           {
             feeTakenFromAmount: true,
           }
         );
+      }
     }
     
     return {
       chainTicker: "ETH",
       to: transaction.to,
       from: transaction.from,
-      balance: ethers.utils.formatEther(balance),
-      value: ethers.utils.formatEther(transaction.value),
-      fee: ethers.utils.formatEther(
-        transaction.gasLimit.mul(transaction.gasPrice)
-      ),
-      total: ethers.utils.formatEther(maxValue),
-      remainingBalance: ethers.utils.formatEther(balance.sub(maxValue)),
-      gasPrice: ethers.utils.formatEther(transaction.gasPrice),
-      gasLimit: ethers.utils.formatEther(transaction.gasLimit),
+      balance: ethers.formatEther(balance),
+      value: ethers.formatEther(transaction.value),
+      fee: ethers.formatEther(maxFee),
+      total: ethers.formatEther(maxValue),
+      remainingBalance: ethers.formatEther(balance - maxValue),
+      maxFeePerGas: ethers.formatEther(transaction.maxFeePerGas),
+      gasLimit: ethers.formatEther(transaction.gasLimit),
       warnings: params.feeTakenFromAmount
         ? [
             {
@@ -99,28 +98,34 @@ module.exports = (api) => {
     try {
       const response = await signer.sendTransaction(transaction);
 
-      if (!api.eth.temp.pending_txs[response.hash]) {
-        api.eth.temp.pending_txs[response.hash] = {
-          hash: response.hash,
-          confirmations: 0,
-          from: response.from,
-          gasPrice: response.gasPrice,
-          gasLimit: response.gasLimit,
-          to: response.to,
-          value: response.value,
-          nonce: response.nonce,
-          data: response.data,
-          chainId: response.data
+      try {
+        if (!api.eth.temp.pending_txs[response.hash]) {
+          api.eth.temp.pending_txs[response.hash] = {
+            hash: response.hash,
+            confirmations: 0,
+            from: response.from,
+            gasPrice: response.maxFeePerGas.toString(),
+            gasLimit: response.gasLimit.toString(),
+            to: response.to,
+            value: response.value.toString(),
+            nonce: response.nonce,
+            data: response.data,
+            chainId: response.data
+          }
         }
+      } catch(e) {
+        console.log(`Error saving tx ${response.hash} to cache`)
+        console.log(e)
       }
+      
 
       return {
         to: response.to,
         from: response.from,
-        value: ethers.utils.formatEther(response.value),
+        value: ethers.formatEther(response.value),
         txid: response.hash,
-        fee: ethers.utils.formatEther(
-          transaction.gasLimit.mul(transaction.gasPrice)
+        fee: ethers.formatEther(
+          transaction.gasLimit * transaction.maxFeePerGas
         )
       }
     } catch(e) {
@@ -150,9 +155,12 @@ module.exports = (api) => {
     const { toAddress, amount } = req.body
 
     try {
+      const response = await api.eth.txPreflight(toAddress, amount.toString());
+      delete response.transaction;
+
       res.send(JSON.stringify({
         msg: 'success',
-        result: await api.eth.txPreflight(toAddress, amount.toString()),
+        result: response
       }));
     } catch(e) {
       const retObj = {

@@ -9,7 +9,7 @@ const hasLock = app.requestSingleInstanceLock()
 if (!hasLock) {
 	app.quit()
 } else {
-  const api = require("./routes/api");
+  let api = require("./routes/api");
 
   Object.freeze(Object.prototype);
   Object.freeze(Object);
@@ -498,6 +498,8 @@ if (!hasLock) {
         mainWindow.hide();
       }
     });
+
+    api = require('./routes/api/utility_apis/alert')(api, mainWindow);
 
     return mainWindow;
   }
