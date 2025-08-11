@@ -1,10 +1,9 @@
 const fs = require('fs-extra');
 const passwdStrength = require('passwd-strength');
 const bitcoin = require('bitgo-utxo-lib');
-const crypto = require('crypto')
-const bigi = require('bigi');
 const aes256 = require('nodejs-aes256');
 const iocane = require('iocane');
+const deriveScalarFromSeed = require('./utils/auth/scalar');
 const session = iocane.createSession()
   .use('cbc')
   .setDerivationRounds(300000);
@@ -21,15 +20,20 @@ module.exports = (api) => {
     const _pin = req.body.key;
     const _str = req.body.string;
 
-    if (_pin &&
-        _str) {
-      let bytes = crypto.createHash('sha256').update(_str).digest()
-      bytes[0] &= 248;
-      bytes[31] &= 127;
-      bytes[31] |= 64;
+    if (_pin && _str) {
+      const { dBigi } = deriveScalarFromSeed(_str, {
+        iguana: true,
+        logWarn: (msg) => {
+          api.alertMainWindow({
+            title: "Private Key Warning!",
+            message: msg,
+            buttons: ["OK"],
+            type: "warning",
+          })
+        }
+      });
 
-      const d = bigi.fromBuffer(bytes);
-      const keyPair = new bitcoin.ECPair(d, null, { network: api.getNetworkData('btc') });
+      const keyPair = new bitcoin.ECPair(dBigi, null, { network: api.getNetworkData('btc') });
       const keys = {
         pub: keyPair.getAddress(),
         priv: keyPair.toWIF(),
