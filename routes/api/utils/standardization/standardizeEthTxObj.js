@@ -26,6 +26,7 @@ const standardizeEthTxObj = (transactions, address, decimals = 18, tokenTxs) => 
         type,
         height: Number(transactions[i].blockNumber),
         timestamp: Number(transactions[i].timeStamp),
+        blocktime: Number(transactions[i].timeStamp),
         txid: transactions[i].hash,
         nonce: transactions[i].nonce,
         blockhash: transactions[i].blockHash,
