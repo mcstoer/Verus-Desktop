@@ -1,6 +1,7 @@
 const ethers = require('ethers');
 const { scientificToDecimal } = require('../numbers');
 const Web3Interface = require('../utils/web3/web3Interface');
+const { TRANSFER_SKIP_CALLSTATIC_TOKENS } = require('../utils/constants/web3');
 
 // speed: slow, average, fast
 module.exports = (api) => {  
@@ -38,11 +39,16 @@ module.exports = (api) => {
       gasEst = BigInt(await contract.transfer.estimateGas(address, amountBn))
       gasLimit = gasEst + (gasEst / BigInt(3));
 
-      transaction = await contract.transfer.staticCall(
-        address,
-        amountBn,
-        { gasLimit: gasLimit, maxFeePerGas: maxFeePerGas }
-      );
+      if (!(TRANSFER_SKIP_CALLSTATIC_TOKENS.some(x => (x.toLowerCase() === contractId)))) {
+        transaction = await contract.transfer.staticCall(
+          address,
+          amountBn,
+          { gasLimit: gasLimit, maxFeePerGas: maxFeePerGas }
+        );
+      } else {
+        api.log("Skipping static call", 'erc20_preflight')  
+      }
+      
     } catch(e) {   
       api.log(e.message, 'erc20_preflight')   
       throw new Error(Web3Interface.decodeWeb3Error(e.message).message)
@@ -133,7 +139,7 @@ module.exports = (api) => {
     return {
       to: address,
       from: response.from,
-      fee: Number(ethers.formatUnits(maxFee, web3Provider.decimals)),
+      fee: Number(ethers.formatEther(maxFee)),
       value: ethers.formatUnits(amountBn, web3Provider.decimals),
       txid: response.hash
     };
