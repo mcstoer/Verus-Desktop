@@ -1,4 +1,5 @@
 const { ETH_HOMESTEAD } = require('../utils/constants/eth_networks');
+const { CONTRACT_SYMBOLS } = require('../utils/constants/web3');
 const createInterface = require('../utils/web3/provider');
 
 module.exports = (api) => {  
@@ -15,6 +16,20 @@ module.exports = (api) => {
           const contractData = await interface.initContract(chainTicker)
 
           const contract = interface.getContract(...contractData)
+
+          let symbol
+
+          if (CONTRACT_SYMBOLS[chainTicker.toLowerCase()]) {
+            symbol = CONTRACT_SYMBOLS[chainTicker.toLowerCase()]
+          } else if (contract.symbol) {
+            try {
+              symbol = await contract.symbol();
+            } catch(e) {
+              symbol = chainTicker
+            }
+          } else {
+            symbol = chainTicker
+          }
   
           api.erc20.contracts[chainTicker] = {
             interface,
@@ -26,8 +41,7 @@ module.exports = (api) => {
               contract.decimals != null
                 ? Number(await contract.decimals())
                 : 18,
-            symbol:
-              contract.symbol != null ? await contract.symbol() : chainTicker,
+            symbol
           };
   
           const retObj = {
