@@ -1,0 +1,3 @@
+module.exports = {
+  TRANSFER_SKIP_CALLSTATIC_TOKENS: ['0xdac17f958d2ee523a2206206994597c13d831ec7']
+}
