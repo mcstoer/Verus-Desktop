@@ -3,7 +3,6 @@ const {
 } = require("../utils/rpc/rpcStatusCodes");
 const RpcError = require("../utils/rpc/rpcError");
 const { SATOSHIS } = require('../utils/constants/math');
-const { BigNumber } = require('ethers');
 
 module.exports = (api) => {      
   // Gets an address balance (z_getbalance), txCount and zTotalBalance are used 
@@ -112,7 +111,7 @@ module.exports = (api) => {
           [coin]:
             balanceResult == null
               ? 0
-              : BigNumber.from(balanceResult.balance).div(BigNumber.from(SATOSHIS)).toNumber(),
+              : Number(BigInt(balanceResult.balance) / BigInt(SATOSHIS)),
         };
 
         if (useCache) cacheAddrBalanceResult(balance);
