@@ -1,4 +1,6 @@
-const ethers = require('ethers-michaeltout')
+const ethers = require('ethers');
+const { HistorySupportingEtherscanProvider } = require('./etherscan');
+const { DEFAULT_ERC20_ABI } = require('./abi');
 
 class Web3Interface {
   constructor(network, apiKeys) {
@@ -7,15 +9,19 @@ class Web3Interface {
 
     this.DefaultProvider = new ethers.getDefaultProvider(
       this.network.key,
-      apiKeys
+      {
+        etherscan: apiKeys.etherscan,
+        infura: apiKeys.infura,
+        exclusive: [ "etherscan", "infura" ]
+      }
     );
 
-    this.EtherscanProvider = new ethers.providers.EtherscanProvider(
+    this.EtherscanProvider = new HistorySupportingEtherscanProvider(
       this.network.key,
       apiKeys.etherscan
     );
 
-    this.InfuraProvider = new ethers.providers.InfuraProvider(
+    this.InfuraProvider = new ethers.InfuraProvider(
       this.network.key,
       apiKeys.infura
     );
@@ -45,7 +51,7 @@ class Web3Interface {
         unparsed: errorString,
         message: errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1),
       };
-    } catch (e) {        
+    } catch (e) {
       return {
         unparsed: errorString,
         message: "Unknown error",
@@ -54,15 +60,7 @@ class Web3Interface {
   }
 
   initContract = async (contractAddress) => {
-    try {
-      const abi = await this.EtherscanProvider.perform("getabi", {
-        address: contractAddress,
-      });
-
-      return [contractAddress, abi];
-    } catch (e) {
-      throw new Error(Web3Interface.decodeWeb3Error(e.message).message)
-    }
+    return [contractAddress, DEFAULT_ERC20_ABI];
   };
 
   getContract = (contractAddress, abi) => {

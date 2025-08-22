@@ -10,7 +10,7 @@ module.exports = (api) => {
             native: {
               public: {
                 //TODO: Return string instead
-                confirmed: Number(ethers.utils.formatEther(
+                confirmed: Number(ethers.formatEther(
                   await api.eth.get_wallet_balance()
                 )),
                 unconfirmed: null,
@@ -37,7 +37,7 @@ module.exports = (api) => {
 
   api.eth.get_address_balance = async (address) => {
     if (api.eth.interface != null) {
-      return await api.eth.interface.DefaultProvider.getBalance(address)
+      return api.eth.interface.DefaultProvider.getBalance(address)
     } else {
       throw new Error("Cannot get balance for inactive coin ETH")
     }
