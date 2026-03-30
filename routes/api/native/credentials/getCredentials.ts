@@ -4,6 +4,7 @@ import {
   DATA_TYPE_OBJECT_CREDENTIAL,
   fromBase58Check,
   IDENTITY_CREDENTIAL,
+  IdentityDefinition,
 } from 'verus-typescript-primitives';
 
 import {ZGetEncryptionAddressResult} from '../zgetencryptionaddress';
@@ -13,14 +14,7 @@ interface VdxfIdResult {
 }
 
 interface IdentityContent {
-  identity: {
-    privateaddress?: string;
-    contentmultimap?: Record<
-      string,
-      Array<Record<string, unknown> | Array<Record<string, unknown>>>
-    >;
-    identityaddress?: string;
-  };
+  identity: IdentityDefinition & {privateaddress?: string};
 }
 
 interface CredentialsMap {
