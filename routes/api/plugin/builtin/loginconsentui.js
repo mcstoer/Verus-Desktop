@@ -1,23 +1,24 @@
 const axios = require('axios');
 const {
+  IdentityUpdateResponse,
   LOGIN_CONSENT_RESPONSE_VDXF_KEY,
   LOGIN_CONSENT_WEBHOOK_VDXF_KEY,
   LOGIN_CONSENT_REDIRECT_VDXF_KEY,
   LoginConsentResponse,
   IDENTITY_UPDATE_RESPONSE_VDXF_KEY,
   ResponseUri,
-} = require("verus-typescript-primitives");
-const { pushMessage } = require('../../../ipc/ipc');
-const { ReservedPluginTypes } = require('../../utils/plugin/builtin');
-const { shell } = require('electron')
-const { URL } = require('url');
+} = require('verus-typescript-primitives');
+const {pushMessage} = require('../../../ipc/ipc');
+const {ReservedPluginTypes} = require('../../utils/plugin/builtin');
+const {shell} = require('electron');
+const {URL} = require('url');
 const base64url = require('base64url');
 
 module.exports = (api) => {
-  api.loginConsentUi = {}
+  api.loginConsentUi = {};
 
   api.loginConsentUi.handle_redirect = (responseKey, response, redirectinfo) => {
-    const { type, uri } = redirectinfo;
+    const {type, uri} = redirectinfo;
 
     let processedType = type;
 
@@ -25,7 +26,7 @@ module.exports = (api) => {
     const usesResponseUri = responseKey === IDENTITY_UPDATE_RESPONSE_VDXF_KEY.vdxfid;
     if (usesResponseUri) {
       const responseUri = ResponseUri.fromJson(redirectinfo);
-      processedType = ResponseUri.type;
+      processedType = responseUri.type;
     }
 
     const post = async () => {
@@ -34,16 +35,13 @@ module.exports = (api) => {
         api.minimizeApp();
       }, 250);
 
-      let result
+      let result;
       try {
-        result = await axios.post(
-          uri,
-          response
-        );
+        result = await axios.post(uri, response);
       } catch (e) {
-        console.error(`Failed to post to webhook ${e}`)
+        console.error(`Failed to post to webhook ${e}`);
       }
-      
+
       return result;
     };
 
@@ -59,7 +57,7 @@ module.exports = (api) => {
 
       switch (responseKey) {
         case LOGIN_CONSENT_RESPONSE_VDXF_KEY.vdxfid:
-          res = new LoginConsentResponse(response)
+          res = new LoginConsentResponse(response);
           break;
 
         case IDENTITY_UPDATE_RESPONSE_VDXF_KEY.vdxfid:
@@ -73,10 +71,7 @@ module.exports = (api) => {
           throw new Error(`Unsupported response key for redirecting: ${responseKey}`);
       }
 
-      url.searchParams.set(
-        responseKey,
-        base64url(res.toBuffer())
-      );
+      url.searchParams.set(responseKey, base64url(res.toBuffer()));
 
       shell.openExternal(url.toString());
       return null;
@@ -90,12 +85,9 @@ module.exports = (api) => {
     };
 
     return handlers[processedType] == null ? null : handlers[processedType]();
-  }
+  };
 
-  api.loginConsentUi.deeplink = async (
-    deeplink,
-    originInfo
-  ) => {
+  api.loginConsentUi.deeplink = async (deeplink, originInfo) => {
     return new Promise((resolve, reject) => {
       try {
         api.startPlugin(
@@ -104,15 +96,11 @@ module.exports = (api) => {
           (data) => {
             try {
               if (data.redirect) {
-                api.loginConsentUi.handle_redirect(
-                  data.responseKey,
-                  data.response,
-                  data.redirect
-                );
-              } 
+                api.loginConsentUi.handle_redirect(data.responseKey, data.response, data.redirect);
+              }
               resolve(data.response);
-            } catch(e) {
-              reject(e)
+            } catch (e) {
+              reject(e);
             }
           },
           (pluginWindow) => {
@@ -122,12 +110,12 @@ module.exports = (api) => {
                 deeplink: deeplink,
                 origin_app_info: originInfo,
               },
-              "VERUS_LOGIN_CONSENT_REQUEST"
+              'VERUS_LOGIN_CONSENT_REQUEST',
             );
           },
           830,
           550,
-          false
+          false,
         );
       } catch (e) {
         reject(e);
@@ -136,19 +124,16 @@ module.exports = (api) => {
   };
 
   api.setPost('/plugin/builtin/verus_login_consent_ui/request', async (req, res, next) => {
-    const { request } = req.body;
-    const { app_id, builtin } = req.api_header
-   
+    const {request} = req.body;
+    const {app_id, builtin} = req.api_header;
+
     try {
       const retObj = {
-        msg: "success",
-        result: await api.loginConsentUi.deeplink(
-          request,
-          {
-            id: app_id,
-            search_builtin: builtin,
-          }
-        ),
+        msg: 'success',
+        result: await api.loginConsentUi.deeplink(request, {
+          id: app_id,
+          search_builtin: builtin,
+        }),
       };
 
       res.send(JSON.stringify(retObj));
