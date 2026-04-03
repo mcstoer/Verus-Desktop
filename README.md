@@ -16,16 +16,16 @@ The Verus Multicoin Wallet and Ecosystem desktop application
 
 Clone the Verus Desktop repository and the GUI submodule:
 ```bash
-git clone --recursive https://github.com/VerusCoin/Verus-Desktop
+git clone --recursive https://github.com/mcstoer/Verus-Desktop
 ```
 
 #### Optional Plugins
 
 Optional plugins can be cloned into the same directory level as the Verus Desktop folder.
 
-The [Verus Login Consent Client](https://github.com/VerusCoin/verus-login-consent-client) is needed to handle deeplinks, including login.
+The [Verus Login Consent Client](https://github.com/mcstoer/verus-login-consent-client) is needed to handle deeplinks, including login.
 ```bash
-git clone https://github.com/VerusCoin/verus-login-consent-client.git
+git clone https://github.com/mcstoer/verus-login-consent-client.git
 ```
 
 The [Verus PBaaS visualizer](https://github.com/VerusCoin/verus-pbaas-visualizer) provides PBaaS network Visualizations in 3d graphs.
