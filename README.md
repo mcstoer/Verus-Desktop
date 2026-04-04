@@ -2,7 +2,7 @@
 
 The Verus Multicoin Wallet and Ecosystem desktop application
 
-## Development Prerequisites
+## Prerequisites
 
 ### Required Software
 
@@ -10,7 +10,8 @@ The Verus Multicoin Wallet and Ecosystem desktop application
     - **Note:** Node.js 20.x is recommended. Node.js 22 and higher are **not supported**.
 2) [Yarn](https://yarnpkg.com/getting-started/install)
 3) [Git](https://git-scm.com/)
-4) [Verus CLI](https://verus.io/wallet)  (`verus` and `verusd` binaries)
+4) [Verus CLI](https://verus.io/wallet)
+    - This is where the `verus` and `verusd` binaries are found.
 
 ### Cloning the Repository and Plugins
 
@@ -21,37 +22,81 @@ git clone -b password-manager-dev --recursive https://github.com/mcstoer/Verus-D
 
 #### Plugins
 
-The plugins should be cloned into the same directory level as the Verus Desktop folder.
+The plugins should be cloned into the same directory level as the `Verus-Desktop` folder.
 
-The [Verus Login Consent Client](https://github.com/mcstoer/verus-login-consent-client) is needed to handle deeplinks, including login.
+The [Verus Login Consent Client](https://github.com/mcstoer/verus-login-consent-client) plugin is needed to handle deeplinks, including login.
 ```bash
 git clone -b password-manager https://github.com/mcstoer/verus-login-consent-client.git
 ```
 
-The [Verus PBaaS visualizer](https://github.com/VerusCoin/verus-pbaas-visualizer) provides PBaaS network Visualizations in 3d graphs.
+The [Verus PBaaS visualizer](https://github.com/VerusCoin/verus-pbaas-visualizer) plugin provides PBaaS network Visualizations in 3d graphs.
 ```bash
 git clone https://github.com/VerusCoin/verus-pbaas-visualizer.git
 ```
 
 ### Verus Desktop Setup
 
-From the Verus Desktop directory, create the following folder structure for your operating system:
+In the `Verus-Desktop/assets` folder, create the following folder depending on your operating system:
 
 | Operating System | Path                        |
 |------------------|-----------------------------|
-| Linux            | `assets/bin/linux64/verusd/`|
-| macOS            | `assets/bin/osx/verusd/`    |
-| Windows          | `assets/bin/win64/verusd/`  |
+| Linux            | `bin/linux64/verusd`|
+| macOS            | `bin/osx/verusd`    |
+| Windows          | `bin\win64\verusd`  |
 
-Copy both `verus` and `verusd` binaries into the appropriate folder (e.g. `assets/bin/linux64/verusd/`).
+Copy both [`verus` and `verusd` binaries](#required-software) into the newly created folder (e.g., `bin/linux64/verusd`).
 
 #### Deeplinks
 
-Deeplinks require running a production build at least once. After that, you can run Verus Desktop in any mode and still have the deeplinks functional.
+Deeplinks are required for the Verus Login Consent Client plugin. To enable them, you need to create a [build](#creating-builds) and launch the resulting AppImage, installer, or executable.
 
-## Running
+## Creating Builds
 
-Verus Desktop can be run without building to allow for easier development or with building to test for production before packaging the app.
+| Operating System | File Type  |
+|------------------|------------|
+| Linux            | `.AppImage`|
+| macOS            | `.dmg`     |
+| Windows          | `.exe`     |
+
+Builds will be located in the `Verus-Desktop/dist` directory.
+
+### Using Linux or macOS
+
+On Linux or macOS, create a build for the respective operating system with:
+```bash
+yarn install:all
+yarn dist:all
+```
+
+#### Building for Windows on Linux (UNTESTED)
+
+To create a build from Linux for Windows, you will need a [Docker container](https://www.electron.build/multi-platform-build#to-build-app-for-windows-on-linux) and to run these commands in the container:
+```bash
+yarn install:all
+yarn dist-win:all
+```
+
+### Using Windows or Manually Creating Builds
+
+To manually build the components and package Verus Desktop, follow these steps.
+
+Build all dependencies, including the GUI and any optional plugins, before packaging the application. See [Production Mode (With Building)](#production-mode-with-building) for how to do this. 
+
+For building on Windows:
+```shell
+yarn dist-win
+```
+
+For manually building on Linux or macOS:
+```shell
+yarn dist
+```
+
+For more detailed information about the build process, see the original [electron-builder](https://www.electron.build) website.
+
+## For Development and Pre-Production Testing
+
+Verus Desktop can be run in a development or production mode. For the production mode, you will need to build the GUI and plugins.
 
 **Important:** If you want to run the GUI and/or the PBaaS visualizer separately, they require the `NODE_OPTIONS=--openssl-legacy-provider` environment variable. However, this environment variable will cause an error when trying to run Verus Desktop in the same terminal, so make sure to use a **separate terminal** for the GUI and PBaaS visualizer. Ignore this note if you are just running the commands with the `:all` suffix.
 
@@ -187,48 +232,3 @@ yarn start
     This indicates that the required environment variable is not set.
 - If you get a blank white window after trying to open the PBaaS visualizer, the PBaaS visualizer needs to be built.
 - If you get a smaller blank white window after using a deeplink, the Login Consent Client needs to be built.
-
-
-## Creating Builds
-
-| Operating System | File Type  |
-|------------------|------------|
-| Linux            | `.AppImage`|
-| macOS            | `.dmg`     |
-| Windows          | `.exe`     |
-
-To create a build from Linux for Windows, you will need either Wine or a [Docker container](https://www.electron.build/multi-platform-build#to-build-app-for-windows-on-linux)
-
-### Using Linux and macOS
-
-On Linux and macOS, package Verus Desktop with plugins using a single terminal with:
-```bash
-yarn install:all
-yarn dist:all
-```
-
-The packaged application will be packaged based on your operating system, and located in the `/dist` directory.
-
-To create a build for Windows:
-```bash
-yarn install:all
-yarn dist-win:all
-```
-
-### Windows or Manual Builds
-
-To manually build the components and package Verus Desktop, follow these steps.
-
-Build all dependencies, including the GUI and any optional plugins, before packaging the application. See [Production Mode (With Building)](#production-mode-with-building) for how to build. 
-
-Package the application:
-```shell
-yarn dist-win
-```
-
-For manually building on Linux or macOS:
-```shell
-yarn dist
-```
-
-For more detailed information about the build process, see the original [electron-builder](https://www.electron.build) website.
