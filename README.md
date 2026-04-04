@@ -16,7 +16,7 @@ The Verus Multicoin Wallet and Ecosystem desktop application
 
 Clone the Verus Desktop repository and the GUI submodule:
 ```bash
-git clone --recursive https://github.com/mcstoer/Verus-Desktop
+git clone -b password-manager-dev --recursive https://github.com/mcstoer/Verus-Desktop
 ```
 
 #### Optional Plugins
@@ -25,7 +25,7 @@ Optional plugins can be cloned into the same directory level as the Verus Deskto
 
 The [Verus Login Consent Client](https://github.com/mcstoer/verus-login-consent-client) is needed to handle deeplinks, including login.
 ```bash
-git clone https://github.com/mcstoer/verus-login-consent-client.git
+git clone -b password-manager https://github.com/mcstoer/verus-login-consent-client.git
 ```
 
 The [Verus PBaaS visualizer](https://github.com/VerusCoin/verus-pbaas-visualizer) provides PBaaS network Visualizations in 3d graphs.
@@ -53,7 +53,7 @@ Deeplinks require running a production build at least once. After that, you can 
 
 Verus Desktop can be run without building to allow for easier development or with building to test for production before packaging the app.
 
-**Important:** Both the GUI and the PBaaS visualizer require the `NODE_OPTIONS=--openssl-legacy-provider` environment variable. This environment variable will cause an error when trying to run Verus Desktop. Make sure to use a **separate terminal** for the GUI and PBaaS visualizer.
+**Important:** If you want to run the GUI and/or the PBaaS visualizer separately, they require the `NODE_OPTIONS=--openssl-legacy-provider` environment variable. However, this environment variable will cause an error when trying to run Verus Desktop in the same terminal, so make sure to use a **separate terminal** for the GUI and PBaaS visualizer. Ignore this note if you are just running the commands with the `:all` suffix.
 
 ### Development Mode (Without Building)
 
