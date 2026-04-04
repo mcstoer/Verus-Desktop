@@ -12,16 +12,16 @@ The Verus Multicoin Wallet and Ecosystem desktop application
 3) [Git](https://git-scm.com/)
 4) [Verus CLI](https://verus.io/wallet)  (`verus` and `verusd` binaries)
 
-### Cloning the Repository and Optional Plugins
+### Cloning the Repository and Plugins
 
 Clone the Verus Desktop repository and the GUI submodule:
 ```bash
 git clone -b password-manager-dev --recursive https://github.com/mcstoer/Verus-Desktop
 ```
 
-#### Optional Plugins
+#### Plugins
 
-Optional plugins can be cloned into the same directory level as the Verus Desktop folder.
+The plugins should be cloned into the same directory level as the Verus Desktop folder.
 
 The [Verus Login Consent Client](https://github.com/mcstoer/verus-login-consent-client) is needed to handle deeplinks, including login.
 ```bash
