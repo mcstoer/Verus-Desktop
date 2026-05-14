@@ -13,7 +13,7 @@ interface VdxfIdResult {
   vdxfid: string;
 }
 
-interface IdentityContent {
+interface Identity {
   identity: IdentityDefinition & {privateaddress?: string};
 }
 
@@ -33,12 +33,8 @@ export default (api: any) => {
     coin: string,
     address: string
   ): Promise<Credential[]> => {
-    // Get the z-address and contentmultimap from the address.
-    const identity: IdentityContent | null = await api.native.get_identity_content(coin, address);
-
-    if (!identity || !identity.identity) {
-      throw new Error(`Identity not found for ${address}`);
-    }
+    // Get the z-address to generate the viewing key.
+    const identity: Identity = await api.native.get_identity(coin, address);
 
     const zaddress = identity.identity.privateaddress;
 
@@ -57,7 +53,7 @@ export default (api: any) => {
     const ivk = keys.ivk;
 
     // Generate the credential key using the ivk.
-    const credentialKeyResult: VdxfIdResult | null = await api.native.get_vdxf_id(
+    const credentialKeyResult: VdxfIdResult = await api.native.get_vdxf_id(
       coin,
       IDENTITY_CREDENTIAL.vdxfid,
       {
@@ -65,17 +61,24 @@ export default (api: any) => {
       }
     );
 
-    if (!credentialKeyResult || !credentialKeyResult.vdxfid) {
+    if (!credentialKeyResult.vdxfid) {
       throw new Error('Failed to generate credential key');
     }
 
     const credentialKey = credentialKeyResult.vdxfid;
 
-    if (!identity.identity.contentmultimap || !identity.identity.contentmultimap[credentialKey]) {
+    const identityContent: Identity = await api.native.get_identity_content(coin, address, {
+      vdxfkey: credentialKey,
+    });
+
+    if (
+      !identityContent.identity.contentmultimap ||
+      !identityContent.identity.contentmultimap[credentialKey]
+    ) {
       return [];
     }
 
-    const credentialEntries = identity.identity.contentmultimap[credentialKey];
+    const credentialEntries = identityContent.identity.contentmultimap[credentialKey];
     const credentials: Credential[] = [];
 
     for (const entry of credentialEntries) {
@@ -145,13 +148,10 @@ export default (api: any) => {
       } catch {
         try {
           const scopeId = await api.native.get_identity(coin, mainScope);
-          if (scopeId && scopeId.identity && scopeId.identity.identityaddress) {
-            mainScope = scopeId.identity.identityaddress;
-          }
+          mainScope = scopeId.identity.identityaddress;
+        } catch {
           // If there is an error getting the identity, then the scope is not an identity.
           // In that case, just leave the scope as is.
-        } catch {
-          // Scope is not an identity, leave as is.
         }
       }
 
