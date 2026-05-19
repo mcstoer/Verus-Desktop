@@ -5,7 +5,7 @@ set -e
 FULL_PATH=$(dirname $0)
 
 source ${FULL_PATH}/directories.sh
-${FULL_PATH}/setup-node.sh
+source ${FULL_PATH}/setup-node.sh
 
 # Install dependencies for the desktop GUI
 (
