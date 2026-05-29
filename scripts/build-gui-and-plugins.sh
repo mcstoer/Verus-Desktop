@@ -3,12 +3,12 @@
 FULL_PATH=$(dirname $0)
 
 source ${FULL_PATH}/directories.sh
-source ${FULL_PATH}/setup-node.sh
 
 # Build the desktop GUI
 (
   echo ""
   echo "Building Verus-Desktop-GUI..."
+  source ${FULL_PATH}/setup-node.sh
   export NODE_OPTIONS=--openssl-legacy-provider
   cd ${GUI_DIR}
   yarn build
@@ -20,7 +20,7 @@ if [ -d "${LOGIN_CONSENT_CLIENT_DIR}" ]; then
   echo "Building verus-login-consent-client..."
   (
     cd ${LOGIN_CONSENT_CLIENT_DIR}
-    yarn build
+    pnpm build
   )
 
   # Copy the build files over
@@ -37,6 +37,7 @@ if [ -d "${PBAAS_VISUALIZER_DIR}" ]; then
   echo ""
   echo "Building verus-pbaas-visualizer..."
   (
+    source ${FULL_PATH}/setup-node.sh
     export NODE_OPTIONS=--openssl-legacy-provider
     cd ${PBAAS_VISUALIZER_DIR}
     yarn build
