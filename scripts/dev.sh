@@ -5,6 +5,29 @@ FULL_PATH=$(dirname $0)
 source ${FULL_PATH}/directories.sh
 source ${FULL_PATH}/setup-node.sh
 
+kill_tree() {
+  local pid=$1 child
+  for child in $(pgrep -P "$pid" 2>/dev/null); do
+    kill_tree "$child"
+  done
+  kill -TERM "$pid" 2>/dev/null
+}
+
+cleanup() {
+  # In the case where the main Electron process crashes or gets terminated,
+  # give the webpack servers extra time to finish before killing them
+  sleep 5
+  echo "Cleaning up processes..."
+  for pid in $(jobs -p); do
+    kill_tree "$pid"
+  done
+
+  # Give the login consent client time to close gracefully
+  sleep 1
+}
+
+trap cleanup EXIT INT TERM
+
 # Start desktop GUI
 (
   echo ""
@@ -36,17 +59,6 @@ if [ -d "${PBAAS_VISUALIZER_DIR}" ]; then
   ) &
 fi
 
-# Start the electron app in development mode
 echo ""
 echo "Starting Verus-Desktop..."
-yarn start devmode
-
-cleanup() {
-  echo "Cleaning up processes..."
-  jobs -p | xargs kill
-
-  # Give the login consent client time to close gracefully
-  sleep 1
-}
-
-trap cleanup EXIT
+yarn debug

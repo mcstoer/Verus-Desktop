@@ -8,7 +8,7 @@
     "build": "tsc && copyfiles -f version.json out/ && copyfiles -u 0 'assets/**/*' out/",
     "start": "yarn run build && cross-env NODE_ENV=development electron .",
     "start:all": "./scripts/prod.sh",
-    "debug": "yarn start devmode",
+    "debug": "yarn start devmode --no-sandbox",
     "dev:all": "./scripts/dev.sh",
     "make-patch": "./make-patch.sh",
     "install:all": "./scripts/setup.sh",
