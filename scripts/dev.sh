@@ -3,7 +3,6 @@
 FULL_PATH=$(dirname $0)
 
 source ${FULL_PATH}/directories.sh
-source ${FULL_PATH}/setup-node.sh
 
 kill_tree() {
   local pid=$1 child
@@ -32,6 +31,7 @@ trap cleanup EXIT INT TERM
 (
   echo ""
   echo "Starting Verus-Desktop-GUI..."
+  source ${FULL_PATH}/setup-node.sh
   export NODE_OPTIONS=--openssl-legacy-provider
   cd ${GUI_DIR}
   yarn start-no-dashboard
@@ -43,7 +43,7 @@ if [ -d "${LOGIN_CONSENT_CLIENT_DIR}" ]; then
     echo ""
     echo "Starting verus-login-consent-client..."
     cd ${LOGIN_CONSENT_CLIENT_DIR}
-    yarn start
+    pnpm start
   ) &
 fi
 
@@ -52,6 +52,7 @@ if [ -d "${PBAAS_VISUALIZER_DIR}" ]; then
   (
     echo ""
     echo "Starting verus-pbaas-visualizer..."
+    source ${FULL_PATH}/setup-node.sh
     export NODE_OPTIONS=--openssl-legacy-provider
     cd ${PBAAS_VISUALIZER_DIR}
     # Discard the webpack dashboard output to not clutter the terminal
