@@ -22,19 +22,14 @@ overrides:
   js-yaml: 3.13.1
   tar: 4.4.18
   https-proxy-agent: 2.2.4
-  mem: 4.0.0
-  bin-links: 1.1.6
   yargs-parser: 21.1.1
   minimist: 1.2.6
   decode-uri-component: 0.2.1
   elliptic: 6.6.1
   ejs: 3.1.7
   bn.js: 4.11.8
-  dot-prop: 5.2.0
-  npm-registry-fetch: 4.0.5
   http-cache-semantics: 4.1.1
   ini: 1.3.8
-  ssri: 8.0.1
   y18n: 5.0.5
   hosted-git-info: 3.0.8
   ajv: 6.12.3
@@ -59,7 +54,6 @@ overrides:
   tiny-secp256k1: 1.1.7
   form-data: 4.0.4
   base-x: 3.0.11
-  ip: 1.1.9
 # The Verus bitcoin-ops fork omits evals.json from its `files` allowlist, so
 # pnpm's npm-pack of the git dep drops it. @bitgo/utxo-lib requires it at load
 # (optccparams.js), so we restore it via patch.
