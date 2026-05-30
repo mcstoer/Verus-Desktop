@@ -41,4 +41,4 @@ fi
 # Install dependencies for the electron app
 echo ""
 echo "Installing dependencies for Verus-Desktop..."
-yarn install
+pnpm install

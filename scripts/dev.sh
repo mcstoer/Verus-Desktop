@@ -62,4 +62,4 @@ fi
 
 echo ""
 echo "Starting Verus-Desktop..."
-yarn debug
+pnpm debug

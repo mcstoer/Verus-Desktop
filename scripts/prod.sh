@@ -7,4 +7,4 @@ ${FULL_PATH}/build-gui-and-plugins.sh
 # Start the electron app
 echo ""
 echo "Starting Verus-Desktop..."
-yarn start
+pnpm start
