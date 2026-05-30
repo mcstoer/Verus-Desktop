@@ -14,11 +14,12 @@ allowBuilds:
 # Verus libraries have git subdependencies.
 blockExoticSubdeps: false
 minimumReleaseAge: 10080 # 7 days
-# Old resolutions ported over. Possibly can be removed.
+# Resolutions ported over from yarn. Some have been updated to newer safe versions since they
+# were pinned to now unsafe ones.
 overrides:
   async: 2.6.4
   blake2b-wasm: https://github.com/michaeltout/blake2b-wasm#a16070b30bb8d8aee670f0c69b642913eca79998 # Must have override.
-  lodash: 4.17.21
+  lodash: 4.18.1
   js-yaml: 3.13.1
   tar: 4.4.18
   https-proxy-agent: 2.2.4
@@ -27,22 +28,22 @@ overrides:
   decode-uri-component: 0.2.1
   elliptic: 6.6.1
   ejs: 3.1.7
-  bn.js: 4.11.8
+  bn.js: 4.12.3
   http-cache-semantics: 4.1.1
   ini: 1.3.8
   y18n: 5.0.5
   hosted-git-info: 3.0.8
-  ajv: 6.12.3
-  ws: 7.4.6
+  ajv: 6.15.0
+  ws: 7.5.11
   normalize-url: 4.5.1
   path-parse: 1.0.7
   ansi-regex: 5.0.1
-  qs: 6.2.4
+  qs: 6.15.2
   debug: 2.6.9
-  follow-redirects: 1.15.4
+  follow-redirects: 1.16.0
   fresh: 0.5.2
   mime: 1.4.1
-  minimatch: 5.1.0
+  minimatch: 5.1.9
   json-schema: 0.4.0
   got: 11.8.5
   json5: 2.2.2
