@@ -17,7 +17,7 @@ minimumReleaseAge: 10080 # 7 days
 # Old resolutions ported over. Possibly can be removed.
 overrides:
   async: 2.6.4
-  blake2b-wasm: https://github.com/michaeltout/blake2b-wasm
+  blake2b-wasm: https://github.com/michaeltout/blake2b-wasm#a16070b30bb8d8aee670f0c69b642913eca79998 # Must have override.
   lodash: 4.17.21
   js-yaml: 3.13.1
   tar: 4.4.18
