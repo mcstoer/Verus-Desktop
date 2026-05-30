@@ -6,4 +6,4 @@ ${FULL_PATH}/build-gui-and-plugins.sh
 
 # Build the the electron app
 echo "Building Verus-Desktop for Windows..."
-yarn dist-win
+pnpm dist-win
