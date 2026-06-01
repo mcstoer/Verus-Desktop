@@ -14,6 +14,11 @@ The Verus Multicoin Wallet and Ecosystem desktop application
 4) [Git](https://git-scm.com/)
 5) [Verus CLI](https://verus.io/wallet)  (`verus` and `verusd` binaries)
 
+For Linux and macOS, setting up Node.js 24.15.0 with pnpm and Node.js 20.x with Yarn can be done with:
+```bash
+source ./scripts/setup-env.sh
+```
+
 ### Cloning the Repository and Optional Plugins
 
 Clone the Verus Desktop repository and the GUI submodule:
@@ -30,7 +35,7 @@ The [Verus Login Consent Client](https://github.com/VerusCoin/verus-login-consen
 git clone https://github.com/VerusCoin/verus-login-consent-client.git
 ```
 
-The [Verus PBaaS visualizer](https://github.com/VerusCoin/verus-pbaas-visualizer) provides PBaaS network Visualizations in 3d graphs.
+The [Verus PBaaS visualizer](https://github.com/VerusCoin/verus-pbaas-visualizer) provides PBaaS network visualizations in 3D graphs.
 ```bash
 git clone https://github.com/VerusCoin/verus-pbaas-visualizer.git
 ```
@@ -65,7 +70,9 @@ pnpm install:all
 pnpm dev:all
 ```
 
-On Windows, or to run each part separately, follow these steps.
+To run each part separately, follow these steps.
+
+**Note**: On Windows, replace `export NODE_OPTIONS=--openssl-legacy-provider` with `set NODE_OPTIONS=--openssl-legacy-provider` for cmd or `$env:NODE_OPTIONS="--openssl-legacy-provider"` for PowerShell.
 
 #### GUI
 
@@ -97,7 +104,7 @@ yarn install
 yarn start
 ```
 
-#### Optional: Login Consent Client 
+#### Optional: Login Consent Client
 
 Open a new terminal, navigate to the Login Consent Client directory:
 ```bash
@@ -132,13 +139,15 @@ pnpm start devmode
 
 ### Production Mode (With Building)
 
-On Linux and macOS, run Verus Desktop with plugins using a single terminal with
+On Linux and macOS, run Verus Desktop with plugins using a single terminal with:
 ```bash
 pnpm install:all
 pnpm start:all
 ```
 
-On Windows, or to manually build the components and run Verus Desktop, follow these steps.
+To manually build the components and run Verus Desktop, follow these steps.
+
+**Note**: On Windows, replace `export NODE_OPTIONS=--openssl-legacy-provider` with `set NODE_OPTIONS=--openssl-legacy-provider` for cmd or `$env:NODE_OPTIONS="--openssl-legacy-provider"` for PowerShell.
 
 #### GUI
 
@@ -159,9 +168,9 @@ yarn install
 yarn build
 ```
 
-After building, you will find the plugin files in the `/build` directory. Create the folder `assets/plugins/builtin/verus-pbaas-visualizer/` inside your Verus Desktop directory and copy the build files into it.
+After building, you will find the plugin files in the `build/` directory. Create the folder `assets/plugins/builtin/verus-pbaas-visualizer/` inside your Verus Desktop directory and copy the build files into it.
 
-#### Optional: Login Consent Client 
+#### Optional: Login Consent Client
 
 Open a new terminal, navigate to the Login Consent Client directory:
 ```bash
@@ -169,7 +178,7 @@ pnpm install
 pnpm build
 ```
 
-After building, you will find the plugin files in the `/build` directory. Create the folder `assets/plugins/builtin/verus-login-consent-client/` inside your Verus Desktop directory and copy the build files into it.
+After building, you will find the plugin files in the `build/` directory. Create the folder `assets/plugins/builtin/verus-login-consent-client/` inside your Verus Desktop directory and copy the build files into it.
 
 #### Desktop
 
@@ -209,7 +218,7 @@ pnpm install:all
 pnpm dist:all
 ```
 
-The packaged application will be packaged based on your operating system, and located in the `/dist` directory.
+The packaged application will be packaged based on your operating system, and located in the `dist/` directory.
 
 To create a build for Windows:
 ```bash
