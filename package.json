@@ -48,7 +48,7 @@
     "@noble/curves": "1.2.0",
     "@xmldom/xmldom": "0.9.10",
     "agama-wallet-lib": "git+https://github.com/VerusCoin/agama-wallet-lib.git#dev",
-    "ajv": "6.12.3",
+    "ajv": "6.15.0",
     "arch": "2.1.0",
     "async": "2.6.4",
     "axios": "1.16.0",
