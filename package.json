@@ -44,7 +44,7 @@
   "license": "MIT",
   "dependencies": {
     "@bitgo/utxo-lib": "git+https://github.com/VerusCoin/BitGoJS.git#2b0f428afbdbc0aa9541aa60b310c8f4c41fd2c5",
-    "@electron/remote": "1.1.0",
+    "@electron/remote": "2.1.3",
     "@noble/curves": "1.2.0",
     "@xmldom/xmldom": "0.9.10",
     "agama-wallet-lib": "git+https://github.com/VerusCoin/agama-wallet-lib.git#dev",
@@ -94,7 +94,7 @@
     "@types/node": "18.19.0",
     "copyfiles": "2.4.1",
     "cross-env": "5.2.1",
-    "electron": "22.3.25",
+    "electron": "42.4.1",
     "electron-builder": "24.13.3",
     "electron-devtools-installer": "3.2.0",
     "eslint": "9.39.2",
