@@ -558,8 +558,10 @@ if (!hasLock) {
     focusMain();
 
     if (process.platform == 'win32' || process.platform == 'linux') {
-      const argIndex = process.platform === 'win32' ? 1 : 2;
-      openurlhandler(null, argv.slice(1)[argIndex], api.dlhandler);
+      const deeplink = argv.find(arg => arg.includes('://'));
+      if (deeplink) {
+        openurlhandler(null, deeplink, api.dlhandler);
+      }
     }
   }
 
