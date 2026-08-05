@@ -1,0 +1,38 @@
+diff --git a/out/node-module-collector/pnpmNodeModulesCollector.js b/out/node-module-collector/pnpmNodeModulesCollector.js
+index 8853912e013d3769f3e763d06720a94091a7ffaa..86bd15624ae1ad0fb769ae720be7fcc556311b62 100644
+--- a/out/node-module-collector/pnpmNodeModulesCollector.js
++++ b/out/node-module-collector/pnpmNodeModulesCollector.js	
+@@ -148,9 +148,7 @@ class PnpmNodeModulesCollector extends nodeModulesCollector_1.NodeModulesCollect
+     async collectDepsRecursively(tree) {
+         const visit = async (key, value) => {
+             var _a, _b;
+-            if (((_a = value === null || value === void 0 ? void 0 : value.dedupedDependenciesCount) !== null && _a !== void 0 ? _a : 0) > 0) {
+-                return;
+-            }
++            const isDeduped = ((_a = value === null || value === void 0 ? void 0 : value.dedupedDependenciesCount) !== null && _a !== void 0 ? _a : 0) > 0;
+             const id = `${key}@${value.version}`;
+             // The pnpm list output can include the same `name@version` thousands of times across a
+             // deep workspace; without this guard we re-resolve and re-recurse each occurrence.
+@@ -160,6 +158,9 @@ class PnpmNodeModulesCollector extends nodeModulesCollector_1.NodeModulesCollect
+             this.collectedDeps.add(id);
+             const pkg = await this.locateFromDepOrRoot(key, value.path, value.version);
+             this.allDependencies.set(id, { ...value, path: (_b = pkg === null || pkg === void 0 ? void 0 : pkg.packageDir) !== null && _b !== void 0 ? _b : value.path });
++            if (isDeduped) {
++                return;
++            }
+             await this.collectDepsRecursively(value);
+         };
+         for (const [key, value] of Object.entries(tree.dependencies || {})) {
+diff --git a/out/util/appFileCopier.js b/out/util/appFileCopier.js
+index 230f5bcd04697279ad8b43f406c9112637065c98..b11b063509feca8e69086790d864d3bfed11ad55 100644
+--- a/out/util/appFileCopier.js
++++ b/out/util/appFileCopier.js	
+@@ -234,7 +234,7 @@ async function collectNodeModulesWithLogging(platformPackager) {
+     const packager = platformPackager.info;
+     const { tempDirManager, appDir, projectDir } = packager;
+     const searchDirectories = Array.from(new Set([appDir, projectDir, await packager.getWorkspaceRoot()])).filter((it) => (0, builder_util_1.isEmptyOrSpaces)(it) === false);
+-    const pmApproaches = [await packager.getPackageManager(), node_module_collector_1.PM.TRAVERSAL];
++    const pmApproaches = [node_module_collector_1.PM.TRAVERSAL, await packager.getPackageManager()];
+     // Validate against the as-declared (pre-extraMetadata) production dependencies so a configured
+     // `extraMetadata.dependencies` entry that isn't installed cannot reject a correct collection.
+     const deps = await resolveFirstMatchingCollection({

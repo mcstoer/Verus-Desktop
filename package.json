@@ -5,11 +5,14 @@
   "description": "Verus Desktop Wallet App",
   "main": "out/main.js",
   "scripts": {
-    "build": "tsc && copyfiles -f version.json out/ && copyfiles -u 0 'assets/**/*' out/",
+    "build": "tsc && copyfiles -f version.json out/ && copyfiles -u 0 \"assets/**/*\" out/",
     "start": "pnpm run build && cross-env NODE_ENV=development electron .",
     "start:all": "./scripts/prod.sh",
     "debug": "pnpm start devmode --no-sandbox",
     "dev:all": "./scripts/dev.sh",
+    "dev:win": "node scripts/win/dev.js",
+    "start:win": "node scripts/win/prod.js",
+    "install:win": "node scripts/win/setup.js",
     "make-patch": "./make-patch.sh",
     "install:all": "./scripts/setup.sh",
     "pack": "pnpm run build && cross-env NODE_ENV=production electron-builder --dir verus-unpacked",
@@ -17,9 +20,9 @@
     "dist-win": "pnpm run build && cross-env NODE_ENV=production electron-builder --publish=never  --win",
     "dist:all": "./scripts/create-build.sh",
     "dist-win:all": "./scripts/create-build-win.sh",
+    "dist:win": "node scripts/win/create-build.js",
     "test": "mocha",
-    "update-agamalib": "rm -rf node_modules/agama-wallet-lib/ && pnpm install",
-    "postinstall": "rm -rf node_modules/bitgo-utxo-lib/node_modules/create-hash"
+    "update-agamalib": "rm -rf node_modules/agama-wallet-lib/ && pnpm install"
   },
   "engines": {
     "node": ">=22.13"
@@ -95,7 +98,7 @@
     "copyfiles": "2.4.1",
     "cross-env": "5.2.1",
     "electron": "22.3.25",
-    "electron-builder": "24.13.3",
+    "electron-builder": "26.15.6",
     "electron-devtools-installer": "3.2.0",
     "eslint": "9.39.2",
     "eslint-config-prettier": "10.1.8",
@@ -126,9 +129,11 @@
       "!README.md",
       "!make*",
       "!check_submodule.sh",
-      "!gui/EasyDEX/react/node_modules${/*}",
-      "!gui/EasyDEX/react/src${/*}",
-      "!gui/EasyDEX/react/www${/*}"
+      "!gui/Verus-Desktop-GUI/react/node_modules${/*}",
+      "!gui/Verus-Desktop-GUI/react/src${/*}",
+      "!gui/Verus-Desktop-GUI/react/www${/*}",
+      "!gui/Verus-Desktop-GUI/react/__tests__${/*}",
+      "!gui/Verus-Desktop-GUI/react/patches${/*}"
     ],
     "includePdb": false,
     "asar": false,
@@ -137,7 +142,8 @@
       "icon": "assets/icons/agama_icons/vrsc.icns",
       "target": [
         "dmg"
-      ]
+      ],
+      "identity": null
     },
     "dmg": {
       "icon": "assets/icons/vrsc.icns",
@@ -158,8 +164,10 @@
       "artifactName": "${productName}-v${version}-${arch}.${ext}",
       "icon": "assets/icons/agama_icons",
       "desktop": {
-        "Encoding": "UTF-8",
-        "MimeType": "x-scheme-handler/i5jtwbp6zymeay9llnraglgjqgdrffsau4;x-scheme-handler/verus"
+        "entry": {
+          "Encoding": "UTF-8",
+          "MimeType": "x-scheme-handler/i5jtwbp6zymeay9llnraglgjqgdrffsau4;x-scheme-handler/verus"
+        }
       },
       "target": [
         "appimage"
@@ -170,7 +178,8 @@
       "target": [
         "nsis"
       ],
-      "icon": "assets/icons/vrsc.ico"
+      "icon": "assets/icons/vrsc.ico",
+      "signExecutable": false
     },
     "nsis": {
       "oneClick": false,

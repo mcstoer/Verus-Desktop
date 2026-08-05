@@ -9,6 +9,8 @@ The Verus Multicoin Wallet and Ecosystem desktop application
 1) [Node.js](https://nodejs.org/en/download/)
     - The Verus-Desktop app and the Login Consent Client require Node.js 22.13 or higher (Node.js 24.15.0 is recommended).
     - The GUI and PBaaS visualizer require Node.js 20.x.
+    - [nvm](https://github.com/nvm-sh/nvm) is recommended for easily getting Node versions on Linux and macOS
+    - [nvm-windows](https://github.com/coreybutler/nvm-windows) is recommended on Windows
 2) [pnpm](https://pnpm.io/installation) (for Verus-Desktop and the Login Consent Client)
 3) [Yarn](https://yarnpkg.com/getting-started/install) (for the GUI and PBaaS visualizer)
 4) [Git](https://git-scm.com/)
@@ -68,6 +70,12 @@ On Linux and macOS, run Verus Desktop with plugins in development mode using a s
 ```bash
 pnpm install:all
 pnpm dev:all
+```
+
+On Windows, run:
+```pwsh
+pnpm install:win
+pnpm dev:win
 ```
 
 To run each part separately, follow these steps.
@@ -145,6 +153,12 @@ pnpm install:all
 pnpm start:all
 ```
 
+On Windows, run:
+```pwsh
+pnpm install:win
+pnpm start:win
+```
+
 To manually build the components and run Verus Desktop, follow these steps.
 
 **Note**: On Windows, replace `export NODE_OPTIONS=--openssl-legacy-provider` with `set NODE_OPTIONS=--openssl-legacy-provider` for cmd or `$env:NODE_OPTIONS="--openssl-legacy-provider"` for PowerShell.
@@ -210,36 +224,40 @@ pnpm start
 
 To create a build from Linux for Windows, you will need either Wine or a [Docker container](https://www.electron.build/multi-platform-build#to-build-app-for-windows-on-linux)
 
-### Using Linux and macOS
-
 On Linux and macOS, package Verus Desktop with plugins using a single terminal with:
 ```bash
 pnpm install:all
 pnpm dist:all
 ```
 
-The packaged application will be packaged based on your operating system, and located in the `dist/` directory.
-
-To create a build for Windows:
-```bash
-pnpm install:all
-pnpm dist-win:all
+On Windows, package with:
+```pwsh
+pnpm install:win
+pnpm dist:win
 ```
 
-### Windows or Manual Builds
+The packaged application will be packaged based on your operating system, and located in the `dist/` directory.
+
+To cross-compile for Windows:
+```bash
+pnpm install:all
+pnpm dist:all
+```
+
+### Manual Builds
 
 To manually build the components and package Verus Desktop, follow these steps.
 
 Build all dependencies, including the GUI and any optional plugins, before packaging the application. See [Production Mode (With Building)](#production-mode-with-building) for how to build. 
 
-Package the application:
-```shell
-pnpm dist-win
-```
-
 For manually building on Linux or macOS:
 ```shell
 pnpm dist
+```
+
+For cross-compiling:
+```shell
+pnpm dist-win
 ```
 
 For more detailed information about the build process, see the original [electron-builder](https://www.electron.build) website.
