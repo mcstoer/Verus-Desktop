@@ -18,6 +18,9 @@ allowBuilds:
 # Verus libraries have git subdependencies.
 blockExoticSubdeps: false
 minimumReleaseAge: 10080 # 7 days
+minimumReleaseAgeExclude:
+  # Security fix for the eMudhra intermediate CA compromise (Oct 2026); remove once it ages past 7 days.
+  - electron@44.9.3
 # Resolutions ported over from yarn. Some have been updated to newer safe versions since they
 # were pinned to now unsafe ones.
 overrides:
