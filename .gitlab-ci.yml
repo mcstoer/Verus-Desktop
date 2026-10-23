@@ -38,6 +38,7 @@ security:tests:
   variables:
     NODE_OPTIONS: --openssl-legacy-provider
   script:
+    - source scripts/useBuildNode.sh
     - yarn install --frozen-lockfile --non-interactive
     - yarn run test:security
     - cd gui/Verus-Desktop-GUI/react
@@ -62,6 +63,7 @@ build:linux:
     PIRATE_CLI_PACKAGE: pirate-cli-ubuntu2004-v${PIRATE_VERSION}.zip
     PIRATE_CLI_SHA256: 2358e992a6649517f6a72f790105468a22c5ae22302076b06f9c528b7c7c4788
   before_script:
+    - source scripts/useBuildNode.sh
     - echo "$AUTH_KEY" > AUTH_KEY.json &&
       gcloud auth activate-service-account
       --key-file AUTH_KEY.json &&
@@ -112,6 +114,7 @@ build:linux:arm64:
     PIRATE_CLI_PACKAGE: pirate-cli-aarch64-v${PIRATE_VERSION}.zip
     PIRATE_CLI_SHA256: c6a3b13881155fb11a8743a9d319254a0ca70f99c14382fb28384446fffe52c5
   before_script:
+    - source scripts/useBuildNode.sh
     - echo "$AUTH_KEY" > AUTH_KEY.json &&
       gcloud auth activate-service-account
       --key-file AUTH_KEY.json &&
@@ -163,6 +166,7 @@ build:windows:
     PIRATE_CLI_PACKAGE: pirate-cli-windows-v${PIRATE_VERSION}.zip
     PIRATE_CLI_SHA256: deb338bf2bcabfdb32be3c13dfaed78d83749fbae9d3985e47cb001ff058bb3f
   before_script:
+    - source scripts/useBuildNode.sh
     - echo "$AUTH_KEY" > AUTH_KEY.json &&
       gcloud auth activate-service-account
       --key-file AUTH_KEY.json &&
@@ -220,6 +224,7 @@ build:mac:
     PIRATE_CLI_PACKAGE: pirate-cli-MacOS-v${PIRATE_VERSION}.zip
     PIRATE_CLI_SHA256: c20a761c36e494cd2b19237162881bb0dcdae24e6eec996072cc5ee7135e8362
   before_script:
+    - source scripts/useBuildNode.sh
     - echo "$AUTH_KEY" > AUTH_KEY.json &&
       gcloud auth activate-service-account
       --key-file AUTH_KEY.json &&
