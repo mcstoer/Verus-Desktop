@@ -7,7 +7,7 @@ The Verus Multicoin Wallet and Ecosystem desktop application
 ### Required Software
 
 1) [Node.js](https://nodejs.org/en/download/)
-    - The Verus-Desktop app and the Login Consent Client require Node.js 22.13 or higher (Node.js 24.15.0 is recommended).
+    - The Verus-Desktop app and the Login Consent Client require Node.js 22.13 or higher (Node.js 24.22.1 is recommended).
     - The GUI and PBaaS visualizer require Node.js 20.x.
     - [nvm](https://github.com/nvm-sh/nvm) is recommended for easily getting Node versions on Linux and macOS
     - [nvm-windows](https://github.com/coreybutler/nvm-windows) is recommended on Windows
@@ -16,7 +16,7 @@ The Verus Multicoin Wallet and Ecosystem desktop application
 4) [Git](https://git-scm.com/)
 5) [Verus CLI](https://verus.io/wallet)  (`verus` and `verusd` binaries)
 
-For Linux and macOS, setting up Node.js 24.15.0 with pnpm and Node.js 20.x with Yarn can be done with:
+For Linux and macOS, setting up Node.js 24.22.1 with pnpm and Node.js 20.x with Yarn can be done with:
 ```bash
 source ./scripts/setup-env.sh
 ```
